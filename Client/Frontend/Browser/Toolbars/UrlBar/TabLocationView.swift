@@ -210,10 +210,12 @@ class TabLocationView: UIView {
         addGestureRecognizer(longPressRecognizer)
         addGestureRecognizer(tapRecognizer)
         
-        var optionSubviews = [readerModeButton, reloadButton, separatorLine, shieldsButton]
+        //var optionSubviews = [readerModeButton, reloadButton, separatorLine, shieldsButton]
+        var optionSubviews = [readerModeButton, reloadButton]
+
         separatorLine.isUserInteractionEnabled = false
         
-        optionSubviews.append(rewardsButton)
+        //optionSubviews.append(rewardsButton)
         
         let buttonContentEdgeInsets = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
         optionSubviews.forEach {
