@@ -10,9 +10,9 @@ extension BraveRewards {
   /// Whether or not Brave Rewards is available/can be enabled
   public static var isAvailable: Bool {
     #if DEBUG
-    return true
+    return false
     #else
-    return DCDevice.current.isSupported
+    return false
     #endif
   }
 }

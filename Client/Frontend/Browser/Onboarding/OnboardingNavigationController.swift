@@ -48,7 +48,7 @@ class OnboardingNavigationController: UINavigationController {
         /// Returns a list of onboarding screens for given type.
         /// Screens should be sorted in order of which they are presented to the user.
         fileprivate var screens: [Screens] {
-            if BraveRewards.isAvailable {
+            /*if BraveRewards.isAvailable {
                 switch self {
                 case .newUser(let progress):
                     //The user already made it to rewards and agreed so they should only see ads countdown
@@ -74,7 +74,9 @@ class OnboardingNavigationController: UINavigationController {
                 case .newUser: return [.searchEnginePicker, .shieldsInfo]
                 case .existingUserRewardsOff, .existingUserRewardsOn: return []
                 }
-            }
+            }*/
+
+            return []
         }
     }
     

@@ -88,3 +88,9 @@ Client/Configuration/Local/
 
 adblock-regions.txt
 yubikit.log
+/.vs/VSWorkspaceState.json
+/.vs/slnx.sqlite
+/.vs/ProjectSettings.json
+/.vs/netguide-ios/v16/Browse.VC.opendb
+/.vs/netguide-ios/v16/Browse.VC.db
+/.vs/netguide-ios/v16/.suo

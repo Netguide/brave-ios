@@ -782,14 +782,14 @@ class BrowserViewController: UIViewController {
     }
 
     override func viewDidAppear(_ animated: Bool) {
-        presentOnboardingIntro()
+        //presentOnboardingIntro()
         
         screenshotHelper.viewIsVisible = true
         screenshotHelper.takePendingScreenshots(tabManager.allTabs)
 
         super.viewDidAppear(animated)
 
-        if shouldShowWhatsNewTab() {
+        /*if shouldShowWhatsNewTab() {
             // Only display if the SUMO topic has been configured in the Info.plist (present and not empty)
             if let whatsNewTopic = AppInfo.whatsNewTopic, whatsNewTopic != "" {
                 if let whatsNewURL = SupportUtils.URLForTopic(whatsNewTopic) {
@@ -797,7 +797,7 @@ class BrowserViewController: UIViewController {
                     profile.prefs.setString(AppInfo.appVersion, forKey: LatestAppVersionProfileKey)
                 }
             }
-        }
+        }*/
 
         if let toast = self.pendingToast {
             self.pendingToast = nil
@@ -807,7 +807,7 @@ class BrowserViewController: UIViewController {
         
         if PrivateBrowsingManager.shared.isPrivateBrowsing {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                self.presentDuckDuckGoCallout()
+                //self.presentDuckDuckGoCallout()
             }
         }
     }
