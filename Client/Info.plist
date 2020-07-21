@@ -13,7 +13,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>$(MOZ_BUNDLE_DISPLAY_NAME)</string>
+	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -42,7 +42,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>$(BRAVE_BUILD_ID)</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSApplicationQueriesSchemes</key>
@@ -69,8 +69,8 @@
 	<string>$(DEVELOPMENT_TEAM)</string>
 	<key>MozWhatsNewTopic</key>
 	<string></string>
-        <key>NFCReaderUsageDescription</key>
-        <string>The application needs access to NFC reading to communicate with your Yubikey.</string>
+	<key>NFCReaderUsageDescription</key>
+	<string>The application needs access to NFC reading to communicate with your Yubikey.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -112,6 +112,8 @@
 	<array>
 		<string>remote-notification</string>
 	</array>
+	<key>UIFileSharingEnabled</key>
+	<true/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -153,12 +155,10 @@
 			<string></string>
 		</dict>
 	</array>
-	<key>UIFileSharingEnabled</key>
-	<true/>
-        <key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
-        <array>
-    	    <string>A000000527471117</string>
-            <string>A0000006472F0001</string>
-        </array>
+	<key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
+	<array>
+		<string>A000000527471117</string>
+		<string>A0000006472F0001</string>
+	</array>
 </dict>
 </plist>
