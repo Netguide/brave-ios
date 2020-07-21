@@ -962,7 +962,7 @@
 "ShowTabsBar" = "Afficher la barre des onglets";
 
 /* Brave panel topmost title */
-"SiteShieldSettings" = "Shields";
+"SiteShieldSettings" = "Protection vie privée";
 
 /* Open search section of settings */
 "StandardTabSearch" = "Onglet standard";
