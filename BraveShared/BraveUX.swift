@@ -2,8 +2,8 @@
 
 public struct BraveUX {    
     public static let braveCommunityURL = URL(string: "https://community.brave.com/")!
-    public static let bravePrivacyURL = URL(string: "https://brave.com/privacy/")!
-    public static let braveTermsOfUseURL = URL(string: "https://www.brave.com/terms_of_use")!
+    public static let bravePrivacyURL = URL(string: "https://www.netguide.com/#Confidentialité")!
+    public static let braveTermsOfUseURL = URL(string: "https://www.netguide.com/#Conditions")!
     public static let prefKeyOptInDialogWasSeen = "OptInDialogWasSeen"
     public static let prefKeyUserAllowsTelemetry = "userallowstelemetry"
     

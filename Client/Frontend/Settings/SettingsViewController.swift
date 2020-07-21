@@ -160,13 +160,13 @@ class SettingsViewController: TableViewController {
         }
         display.rows.append(row)
         
-        display.rows.append(Row(text: Strings.NTP.settingsTitle,
+        /*display.rows.append(Row(text: Strings.NTP.settingsTitle,
             selection: { [unowned self] in
                 self.navigationController?.pushViewController(NTPTableViewController(), animated: true)
             },
             accessory: .disclosureIndicator,
             cellClass: MultilineValue1Cell.self
-        ))
+        ))*/
         
         if UIDevice.current.userInterfaceIdiom == .pad {
             display.rows.append(
@@ -400,7 +400,7 @@ class SettingsViewController: TableViewController {
                 Row(text: Strings.rateBrave,
                     selection: { [unowned self] in
                         // Rate Brave
-                        guard let writeReviewURL = URL(string: "https://itunes.apple.com/app/id1052879175?action=write-review")
+                        guard let writeReviewURL = URL(string: "https://apps.apple.com/app/id1523559660?action=write-review")
                             else { return }
                         UIApplication.shared.open(writeReviewURL)
                         self.dismiss(animated: true)
