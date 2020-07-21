@@ -737,7 +737,7 @@
 "QuickSearchEngines" = "Moteurs de recherches rapides";
 
 /* Open the App Store to rate Brave. */
-"RateBrave" = "Noter Brave";
+"RateBrave" = "Noter Netguide";
 
 /* Accessibility label for button increasing font size in display settings of reader mode */
 "ReaderModeBiggerFontButtonAccessibilityLabel" = "Augmenter la taille du texte";
@@ -899,7 +899,7 @@
 "SettingsLicenses" = "Licences";
 
 /* Title for settings menu item */
-"SettingsMenuItem" = "Paramètres";
+"SettingsMenuItem" = "Réglages";
 
 /* Context menu item for sharing a link URL */
 "ShareLinkActionTitle" = "Partager le lien";

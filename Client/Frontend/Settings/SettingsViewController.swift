@@ -96,7 +96,7 @@ class SettingsViewController: TableViewController {
         list.append(generalSection)
         list.append(displaySection)
         #if !NO_SYNC
-            list.append(otherSettingsSection)
+            //list.append(otherSettingsSection)
         #endif
         list.append(contentsOf: [privacySection,
                                  securitySection,
@@ -105,7 +105,7 @@ class SettingsViewController: TableViewController {
                                  aboutSection])
         
         if let debugSection = debugSection {
-            list.append(debugSection)
+            //list.append(debugSection)
         }
 
         return list
@@ -117,12 +117,12 @@ class SettingsViewController: TableViewController {
         var general = Section(
             header: .title(Strings.settingsGeneralSectionTitle),
             rows: [
-                Row(text: Strings.searchEngines, selection: {
+                /*Row(text: Strings.searchEngines, selection: {
                     let viewController = SearchSettingsTableViewController()
                     viewController.model = self.profile.searchEngines
                     viewController.profile = self.profile
                     self.navigationController?.pushViewController(viewController, animated: true)
-                }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self),
+                }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self),*/
                 .boolRow(title: Strings.saveLogins, option: Preferences.General.saveLogins),
                 .boolRow(title: Strings.blockPopups, option: Preferences.General.blockPopups)
             ]
@@ -391,12 +391,12 @@ class SettingsViewController: TableViewController {
         return Section(
             header: .title(Strings.support),
             rows: [
-                Row(text: Strings.reportABug,
+                /*Row(text: Strings.reportABug,
                     selection: { [unowned self] in
                         self.settingsDelegate?.settingsOpenURLInNewTab(BraveUX.braveCommunityURL)
                         self.dismiss(animated: true)
                     },
-                    cellClass: MultilineButtonCell.self),
+                    cellClass: MultilineButtonCell.self),*/
                 Row(text: Strings.rateBrave,
                     selection: { [unowned self] in
                         // Rate Brave
