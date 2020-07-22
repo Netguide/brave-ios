@@ -1013,6 +1013,7 @@ private struct EmptyPrivateTabsViewUX {
         $0.setTitleColor(UIConstants.privateModeTextHighlightColor, for: [])
         $0.titleLabel?.font = EmptyPrivateTabsViewUX.learnMoreFont
         $0.titleLabel?.numberOfLines = 0
+        $0.isHidden = true
     }
 
     let iconImageView = UIImageView(image: #imageLiteral(resourceName: "private_glasses")).then {

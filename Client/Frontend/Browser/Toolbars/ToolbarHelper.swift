@@ -27,10 +27,12 @@ class ToolbarHelper: NSObject {
         toolbar.shareButton.accessibilityLabel = Strings.tabToolbarShareButtonAccessibilityLabel
         toolbar.shareButton.addTarget(self, action: #selector(didClickShare), for: UIControl.Event.touchUpInside)
         
-        toolbar.addTabButton.setImage(#imageLiteral(resourceName: "add_tab").template, for: .normal)
+        toolbar.addTabButton.setImage(#imageLiteral(resourceName: "add-tab-netguide").template, for: .normal)
         toolbar.addTabButton.accessibilityLabel = Strings.tabToolbarAddTabButtonAccessibilityLabel
         toolbar.addTabButton.addTarget(self, action: #selector(didClickAddTab), for: UIControl.Event.touchUpInside)
-        toolbar.addTabButton.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(didLongPressAddTab(_:))))
+        //toolbar.addTabButton.tintColor = UIColor(rgb: 0x00FF00).withAlphaComponent(1)
+        
+        //toolbar.addTabButton.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(didLongPressAddTab(_:))))
         
         toolbar.searchButton.setImage(#imageLiteral(resourceName: "ntp-search").template, for: .normal)
         // Accessibility label not needed, since overriden in the bottom tool bar class.

@@ -648,7 +648,7 @@ class BookmarkTests: CoreDataTestCase {
     private func insertBookmarks(amount: Int, parent: Bookmark? = nil) {
         let bookmarksBeforeInsert = try! DataController.viewContext.count(for: fetchRequest)
         
-        let url = "https://brave.com/"
+        let url = "https://www.netguide.com/"
         for i in 1...amount {
             let title = String(i)
             createAndWait(url: URL(string: url + title), title: title, parentFolder: parent)
