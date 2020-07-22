@@ -1,6 +1,6 @@
 ![Build](https://github.com/brave/brave-ios/workflows/Build/badge.svg?branch=development)
 
-Brave for iOS 🦁
+Netguide for iOS
 ===============
 
 Download on the [App Store](https://itunes.apple.com/app/brave-web-browser/id1052879175?mt=8).
