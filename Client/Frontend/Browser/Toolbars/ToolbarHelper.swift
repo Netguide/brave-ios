@@ -15,14 +15,12 @@ class ToolbarHelper: NSObject {
         
         toolbar.backButton.setImage(#imageLiteral(resourceName: "nav-back").template, for: .normal)
         toolbar.backButton.accessibilityLabel = Strings.tabToolbarBackButtonAccessibilityLabel
-        let longPressGestureBackButton = UILongPressGestureRecognizer(target: self, action: #selector(didLongPressBack))
-        toolbar.backButton.addGestureRecognizer(longPressGestureBackButton)
+        toolbar.backButton.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(didLongPressBack)))
         toolbar.backButton.addTarget(self, action: #selector(didClickBack), for: .touchUpInside)
         
         toolbar.tabsButton.setImage(#imageLiteral(resourceName: "tabs-manager").template, for: .normal)
         toolbar.tabsButton.addTarget(self, action: #selector(didClickTabs), for: .touchUpInside)
-        let longPressGestureTabsButton = UILongPressGestureRecognizer(target: self, action: #selector(didLongPressTabs))
-        toolbar.tabsButton.addGestureRecognizer(longPressGestureTabsButton)
+        toolbar.tabsButton.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(didLongPressTabs)))
         
         toolbar.shareButton.setImage(#imageLiteral(resourceName: "nav-share").template, for: .normal)
         toolbar.shareButton.accessibilityLabel = Strings.tabToolbarShareButtonAccessibilityLabel

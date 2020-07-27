@@ -52,13 +52,14 @@ class MenuViewController: UITableViewController {
     }
     
     private enum MenuButtons: Int, CaseIterable {
-        case settings, history, bookmarks, downloads, add, share
-        
+        //case settings, history, bookmarks, downloads, add, share
+        case history, bookmarks, downloads, add, share
+
         var title: String {
             switch self {
             case .bookmarks: return Strings.bookmarksMenuItem
             case .history: return Strings.historyMenuItem
-            case .settings: return Strings.settingsMenuItem
+            //case .settings: return Strings.settingsMenuItem
             case .add: return Strings.addToMenuItem
             case .share: return Strings.shareWithMenuItem
             case .downloads: return Strings.downloadsMenuItem
@@ -69,7 +70,7 @@ class MenuViewController: UITableViewController {
             switch self {
             case .bookmarks: return #imageLiteral(resourceName: "menu_bookmarks").template
             case .history: return #imageLiteral(resourceName: "menu-history").template
-            case .settings: return #imageLiteral(resourceName: "menu-settings").template
+            //case .settings: return #imageLiteral(resourceName: "menu-settings").template
             case .add: return #imageLiteral(resourceName: "menu-add-bookmark").template
             case .share: return #imageLiteral(resourceName: "nav-share").template
             case .downloads: return #imageLiteral(resourceName: "menu-downloads").template
@@ -152,7 +153,7 @@ class MenuViewController: UITableViewController {
         switch button {
         case .bookmarks: openBookmarks()
         case .history: openHistory()
-        case .settings: openSettings()
+        //case .settings: openSettings()
         case .add: openAddBookmark()
         case .share: openShareSheet()
         case .downloads: openDownloads()

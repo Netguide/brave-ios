@@ -1536,6 +1536,27 @@ class BrowserViewController: UIViewController {
         _ = tabManager.addTabAndSelect(request, isPrivate: isPrivate)
     }
 
+    func openNetguideTab(attemptLocationFieldFocus: Bool, isPrivate: Bool = false, searchFor searchText: String? = nil) {
+        popToBVC()
+        
+        var done = false
+        
+        for tab in tabManager.tabsForCurrentMode where tab.url?.host == "www.netguide.com" {
+            if tab.id == tabManager.selectedTab?.id {
+                tabManager.reloadSelectedTab()
+                done = true
+                
+            } else {
+                tabManager.selectTab(tab)
+                done = true
+            }
+        }
+        
+        if !done {
+            self.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
+        }
+    }
+    
     func openBlankNewTab(attemptLocationFieldFocus: Bool, isPrivate: Bool = false, searchFor searchText: String? = nil) {
         popToBVC()
         openURLInNewTab(nil, isPrivate: isPrivate, isPrivileged: true)
@@ -2107,25 +2128,7 @@ extension BrowserViewController: ToolbarDelegate {
     }
     
     func tabToolbarDidPressAddTab(_ tabToolbar: ToolbarProtocol, button: UIButton) {
-        
-        var tabManager: TabManager!
-        var done: Bool
-        
-        done = false
-        
-        for tab in tabManager.tabsForCurrentMode where tab.url?.host == "www.netguide.com" {
-            if tab.id == tabManager.selectedTab?.id {
-                //tab.url = "https://www.netguide.com/".asURL
-                done = true
-            } else {
-                tabManager.selectTab(tab)
-                done = true
-            }
-        }
-        
-        if !done {
-            self.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
-        }
+        self.openNetguideTab(attemptLocationFieldFocus: true, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
     }
 
     func tabToolbarDidLongPressAddTab(_ tabToolbar: ToolbarProtocol, button: UIButton) {

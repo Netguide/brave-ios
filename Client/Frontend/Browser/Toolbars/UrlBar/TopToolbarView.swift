@@ -111,8 +111,9 @@ class TopToolbarView: UIView, ToolbarProtocol {
     
     let line = UIView()
     
-    let tabsButton = TabsButton(top: true)
-    
+    //let tabsButton = TabsButton(top: true)
+    let tabsButton = ToolbarButton(top: true)
+
     fileprivate lazy var progressBar: GradientProgressBar = {
         let progressBar = GradientProgressBar()
         progressBar.clipsToBounds = false
@@ -517,6 +518,10 @@ extension TopToolbarView: TabLocationViewDelegate {
             overlayText = url.absoluteString.replacingOccurrences(of: host, with: host.asciiHostToUTF8())
         }
         enterOverlayMode(overlayText, pasted: false, search: isSearchQuery)
+    }
+    
+    func openSettings() {
+        //FUCK
     }
     
     func tabLocationViewDidLongPressLocation(_ tabLocationView: TabLocationView) {

@@ -212,7 +212,7 @@ class FavoriteTests: CoreDataTestCase {
     
     @discardableResult
     private func makeFavorites(_ count: Int) -> [Bookmark] {
-        let bookmarks = (0..<count).map { createAndWait(url: URL(string: "https://www.netguide.com/\($0)"), title: "Netguide") }
+        let bookmarks = (0..<count).map { createAndWait(url: URL(string: "https://brave.com/\($0)"), title: "brave") }
         XCTAssertEqual(bookmarks.count, count)
         XCTAssertEqual(try! DataController.viewContext.count(for: fetchRequest), bookmarks.count)
         return bookmarks

@@ -10,7 +10,8 @@ import BraveShared
 class BottomToolbarView: UIView, ToolbarProtocol {
     weak var tabToolbarDelegate: ToolbarDelegate?
 
-    let tabsButton = TabsButton(top: false)
+    //let tabsButton = TabsButton(top: false)
+    let tabsButton = ToolbarButton(top: false)
     let forwardButton = ToolbarButton(top: false)
     let backButton = ToolbarButton(top: false)
     let shareButton = ToolbarButton(top: false)

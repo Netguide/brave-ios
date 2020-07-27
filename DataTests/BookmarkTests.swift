@@ -109,8 +109,8 @@ class BookmarkTests: CoreDataTestCase {
     // MARK: - Create
     
     func testSimpleCreate() {
-        let url = "https://www.netguide.com/"
-        let title = "Netguide"
+        let url = "https://brave.com"
+        let title = "Brave"
         
         let result = createAndWait(url: URL(string: url), title: title)
         XCTAssertEqual(try! DataController.viewContext.count(for: fetchRequest), 1)
@@ -131,7 +131,7 @@ class BookmarkTests: CoreDataTestCase {
     
     func testValidateBookmark() {
         let validate = BookmarkValidation.validateBookmark
-        XCTAssertTrue(validate("Netguide", "https://www.netguide.com/"))
+        XCTAssertTrue(validate("Brave", "https://brave.com"))
         XCTAssertTrue(validate("Brave", "https://brave.com/"))
         XCTAssertTrue(validate("Brave", "https://brave.com"))
         XCTAssertTrue(validate("Brave", "https://brave.com/"))
@@ -648,7 +648,7 @@ class BookmarkTests: CoreDataTestCase {
     private func insertBookmarks(amount: Int, parent: Bookmark? = nil) {
         let bookmarksBeforeInsert = try! DataController.viewContext.count(for: fetchRequest)
         
-        let url = "https://brave.com"
+        let url = "https://brave.com/"
         for i in 1...amount {
             let title = String(i)
             createAndWait(url: URL(string: url + title), title: title, parentFolder: parent)

@@ -7,7 +7,8 @@ import Foundation
 protocol ToolbarProtocol: class {
     
     var tabToolbarDelegate: ToolbarDelegate? { get set }
-    var tabsButton: TabsButton { get }
+    //var tabsButton: TabsButton { get }
+    var tabsButton: ToolbarButton { get }
     var backButton: ToolbarButton { get }
     var forwardButton: ToolbarButton { get }
     var shareButton: ToolbarButton { get }
@@ -18,7 +19,7 @@ protocol ToolbarProtocol: class {
     
     func updateBackStatus(_ canGoBack: Bool)
     func updatePageStatus(_ isWebPage: Bool)
-    func updateTabCount(_ count: Int)
+    //func updateTabCount(_ count: Int)
 }
 
 extension ToolbarProtocol {
@@ -34,9 +35,9 @@ extension ToolbarProtocol {
         forwardButton.isEnabled = canGoForward
     }
     
-    func updateTabCount(_ count: Int) {
+    /*func updateTabCount(_ count: Int) {
         tabsButton.updateTabCount(count)
-    }
+    }*/
 }
 
 protocol ToolbarDelegate: class {

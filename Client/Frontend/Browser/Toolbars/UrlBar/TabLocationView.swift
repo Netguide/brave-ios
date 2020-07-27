@@ -20,6 +20,7 @@ protocol TabLocationViewDelegate {
     func tabLocationViewDidTapStop(_ tabLocationView: TabLocationView)
     func tabLocationViewDidTapShieldsButton(_ urlBar: TabLocationView)
     func tabLocationViewDidTapRewardsButton(_ urlBar: TabLocationView)
+    func openSettings()
     
     /// - returns: whether the long-press was handled by the delegate; i.e. return `false` when the conditions for even starting handling long-press were not satisfied
     @discardableResult func tabLocationViewDidLongPressReaderMode(_ tabLocationView: TabLocationView) -> Bool
@@ -186,6 +187,15 @@ class TabLocationView: UIView {
         return button
     }()
     
+    lazy var settingsButton: ToolbarButton = {
+        let button = ToolbarButton(top: true)
+        button.setImage(UIImage(imageLiteralResourceName: "settings"), for: .normal)
+        button.addTarget(self, action: #selector(didClickSettingsButton), for: .touchUpInside)
+        button.imageView?.contentMode = .center
+        button.accessibilityIdentifier = "urlBar-settingsButton"
+        return button
+    }()
+    
     lazy var rewardsButton: RewardsButton = {
         let button = RewardsButton()
         button.addTarget(self, action: #selector(didClickBraveRewardsButton), for: .touchUpInside)
@@ -210,7 +220,7 @@ class TabLocationView: UIView {
         addGestureRecognizer(longPressRecognizer)
         addGestureRecognizer(tapRecognizer)
         
-        var optionSubviews = [readerModeButton, reloadButton, separatorLine, shieldsButton]
+        var optionSubviews = [readerModeButton, reloadButton, separatorLine, shieldsButton, settingsButton]
 
         separatorLine.isUserInteractionEnabled = false
         
@@ -311,6 +321,11 @@ class TabLocationView: UIView {
         delegate?.tabLocationViewDidTapShieldsButton(self)
     }
     
+    @objc func didClickSettingsButton() {
+        delegate?.openSettings()
+        
+    }
+
     @objc func didClickBraveRewardsButton() {
         delegate?.tabLocationViewDidTapRewardsButton(self)
     }
