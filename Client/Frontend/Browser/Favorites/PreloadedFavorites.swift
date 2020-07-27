@@ -18,11 +18,11 @@ struct PreloadedFavorites {
                 list.append(FavoriteSite(url: url, title: "Youtube"))
             }
             
-            if let url = URL(string: "https://www.amazon.com/") {
+            if let url = URL(string: "https://www.amazon.fr/") {
                 list.append(FavoriteSite(url: url, title: "Amazon"))
             }
             
-            if let url = URL(string: "https://www.wikipedia.org/") {
+            if let url = URL(string: "https://fr.wikipedia.org/") {
                 list.append(FavoriteSite(url: url, title: "Wikipedia"))
             }
             
@@ -30,13 +30,13 @@ struct PreloadedFavorites {
                 list.append(FavoriteSite(url: url, title: "Twitter"))
             }
             
-            if let url = URL(string: "https://reddit.com/") {
+            /*if let url = URL(string: "https://reddit.com/") {
                 list.append(FavoriteSite(url: url, title: "Reddit"))
-            }
+            }*/
             
-            if let url = URL(string: "https://brave.com/msupport/") {
+            /*if let url = URL(string: "https://brave.com/msupport/") {
                 list.append(FavoriteSite(url: url, title: Strings.NTP.braveSupportFavoriteTitle))
-            }
+            }*/
 
             return list
         }

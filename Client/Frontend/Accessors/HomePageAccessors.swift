@@ -17,7 +17,11 @@ class HomePageAccessors {
             return nil
         }
         return NSURL(string: urlString) as URL?*/
-
-        return NSURL(string: "https://www.netguide.com/") as URL?
+        
+        return NSURL(string: "https://www.netguide.com/#MobileApp") as URL?
+    }
+    
+    static func getHomePagePrivate(_ prefs: Prefs) -> URL? {
+        return NSURL(string: "https://www.netguide.com/#PrivateMobileApp") as URL?
     }
 }

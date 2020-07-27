@@ -2107,7 +2107,25 @@ extension BrowserViewController: ToolbarDelegate {
     }
     
     func tabToolbarDidPressAddTab(_ tabToolbar: ToolbarProtocol, button: UIButton) {
-        self.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
+        
+        var tabManager: TabManager!
+        var done: Bool
+        
+        done = false
+        
+        for tab in tabManager.tabsForCurrentMode where tab.url?.host == "www.netguide.com" {
+            if tab.id == tabManager.selectedTab?.id {
+                //tab.url = "https://www.netguide.com/".asURL
+                done = true
+            } else {
+                tabManager.selectTab(tab)
+                done = true
+            }
+        }
+        
+        if !done {
+            self.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
+        }
     }
 
     func tabToolbarDidLongPressAddTab(_ tabToolbar: ToolbarProtocol, button: UIButton) {
@@ -2516,8 +2534,8 @@ extension BrowserViewController: TabManagerDelegate {
 
     fileprivate func updateTabCountUsingTabManager(_ tabManager: TabManager) {
         let count = tabManager.tabsForCurrentMode.count
-        toolbar?.updateTabCount(count)
-        topToolbar.updateTabCount(count)
+        //toolbar?.updateTabCount(count)
+        //topToolbar.updateTabCount(count)
     }
 }
 

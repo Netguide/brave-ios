@@ -19,6 +19,7 @@ class ToolbarHelper: NSObject {
         toolbar.backButton.addGestureRecognizer(longPressGestureBackButton)
         toolbar.backButton.addTarget(self, action: #selector(didClickBack), for: .touchUpInside)
         
+        toolbar.tabsButton.setImage(#imageLiteral(resourceName: "tabs-manager").template, for: .normal)
         toolbar.tabsButton.addTarget(self, action: #selector(didClickTabs), for: .touchUpInside)
         let longPressGestureTabsButton = UILongPressGestureRecognizer(target: self, action: #selector(didLongPressTabs))
         toolbar.tabsButton.addGestureRecognizer(longPressGestureTabsButton)
@@ -27,13 +28,11 @@ class ToolbarHelper: NSObject {
         toolbar.shareButton.accessibilityLabel = Strings.tabToolbarShareButtonAccessibilityLabel
         toolbar.shareButton.addTarget(self, action: #selector(didClickShare), for: UIControl.Event.touchUpInside)
         
-        toolbar.addTabButton.setImage(#imageLiteral(resourceName: "add-tab-netguide").template, for: .normal)
+        toolbar.addTabButton.setImage(#imageLiteral(resourceName: "add-tab-netguide").withRenderingMode(.alwaysOriginal), for: .normal)
         toolbar.addTabButton.accessibilityLabel = Strings.tabToolbarAddTabButtonAccessibilityLabel
         toolbar.addTabButton.addTarget(self, action: #selector(didClickAddTab), for: UIControl.Event.touchUpInside)
-        //toolbar.addTabButton.tintColor = UIColor(rgb: 0x00FF00).withAlphaComponent(1)
-        
-        //toolbar.addTabButton.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(didLongPressAddTab(_:))))
-        
+        toolbar.addTabButton.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(didLongPressAddTab(_:))))
+
         toolbar.searchButton.setImage(#imageLiteral(resourceName: "ntp-search").template, for: .normal)
         // Accessibility label not needed, since overriden in the bottom tool bar class.
         toolbar.searchButton.addTarget(self, action: #selector(didClickSearch), for: UIControl.Event.touchUpInside)

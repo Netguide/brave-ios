@@ -20,12 +20,15 @@ class BottomToolbarView: UIView, ToolbarProtocol {
     }
     let menuButton = ToolbarButton(top: false)
     let actionButtons: [Themeable & UIButton]
-
+    let actionButtons2: [Themeable & UIButton]
+    
     var helper: ToolbarHelper?
     private let contentView = UIStackView()
 
     fileprivate override init(frame: CGRect) {
         actionButtons = [backButton, forwardButton, addTabButton, searchButton, tabsButton, menuButton]
+        actionButtons2 = [backButton, forwardButton, searchButton, tabsButton, menuButton]
+        
         super.init(frame: frame)
         setupAccessibility()
 
@@ -120,7 +123,7 @@ class BottomToolbarView: UIView, ToolbarProtocol {
 
 extension BottomToolbarView: Themeable {
     var themeableChildren: [Themeable?]? {
-        return actionButtons
+        return actionButtons2
     }
     
     func applyTheme(_ theme: Theme) {

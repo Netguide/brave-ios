@@ -28,19 +28,25 @@ class ToolbarButton: UIButton {
     
     override open var isHighlighted: Bool {
         didSet {
-            self.tintColor = isHighlighted ? selectedTintColor : primaryTintColor
+            if self.accessibilityIdentifier != "TabToolbar.addTabButton" && self.accessibilityIdentifier != "TabToolbarAddTabButtonAccessibilityLabel" {
+                self.tintColor = isHighlighted ? selectedTintColor : primaryTintColor
+            }
         }
     }
     
     override open var isEnabled: Bool {
         didSet {
-            self.tintColor = isEnabled ? primaryTintColor : disabledTintColor
+            if self.accessibilityIdentifier != "TabToolbar.addTabButton" && self.accessibilityIdentifier != "TabToolbarAddTabButtonAccessibilityLabel" {
+                self.tintColor = isEnabled ? primaryTintColor : disabledTintColor
+            }
         }
     }
     
     override var tintColor: UIColor! {
         didSet {
-            self.imageView?.tintColor = self.tintColor
+            if self.accessibilityIdentifier != "TabToolbar.addTabButton" && self.accessibilityIdentifier != "TabToolbarAddTabButtonAccessibilityLabel" {
+                self.imageView?.tintColor = self.tintColor
+            }
         }
     }
     
