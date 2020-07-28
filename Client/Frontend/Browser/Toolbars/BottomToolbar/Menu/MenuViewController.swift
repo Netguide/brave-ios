@@ -254,7 +254,7 @@ class MenuViewController: UITableViewController {
         open(vc, doneButton: DoneButton(style: .done, position: .right))
     }
     
-    private func openSettings() {
+    public func openSettings() {
         let vc = SettingsViewController(profile: bvc.profile, tabManager: bvc.tabManager, rewards: bvc.rewards)
         vc.settingsDelegate = bvc
         open(vc, doneButton: DoneButton(style: .done, position: .right),

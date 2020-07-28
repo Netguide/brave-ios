@@ -187,14 +187,14 @@ class TabLocationView: UIView {
         return button
     }()
     
-    lazy var settingsButton: ToolbarButton = {
-        let button = ToolbarButton(top: true)
-        button.setImage(UIImage(imageLiteralResourceName: "settings"), for: .normal)
-        button.addTarget(self, action: #selector(didClickSettingsButton), for: .touchUpInside)
-        button.imageView?.contentMode = .center
-        button.accessibilityIdentifier = "urlBar-settingsButton"
-        return button
-    }()
+    lazy var settingsButton = ToolbarButton(top: true).then {
+        $0.isAccessibilityElement = true
+        $0.setImage(UIImage(imageLiteralResourceName: "settings").template, for: .normal)
+        $0.addTarget(self, action: #selector(didClickSettingsButton), for: .touchUpInside)
+        //$0.imageView?.contentMode = .center
+        $0.accessibilityIdentifier = "urlBar-settingsButton"
+        $0.tintColor = UIColor.Photon.grey30
+    }
     
     lazy var rewardsButton: RewardsButton = {
         let button = RewardsButton()
@@ -272,7 +272,7 @@ class TabLocationView: UIView {
 
     override var accessibilityElements: [Any]? {
         get {
-            return [lockImageView, urlTextField, readerModeButton, reloadButton, shieldsButton].filter { !$0.isHidden }
+            return [lockImageView, urlTextField, readerModeButton, reloadButton, shieldsButton, settingsButton].filter { !$0.isHidden }
         }
         set {
             super.accessibilityElements = newValue
@@ -322,7 +322,15 @@ class TabLocationView: UIView {
     }
     
     @objc func didClickSettingsButton() {
-        delegate?.openSettings()
+        
+        if let appDelegate = UIApplication.shared.delegate as? AppDelegate,
+        let bvc = appDelegate.browserViewController {
+            let vc = SettingsViewController(profile: bvc.profile, tabManager: bvc.tabManager, rewards: bvc.rewards)
+            vc.settingsDelegate = bvc
+            
+            MenuViewController(bvc: bvc, tab: bvc.tabManager.selectedTab).openSettings()
+            //delegate?.homePanel.openSettings()
+        }
         
     }
 
@@ -391,7 +399,7 @@ extension TabLocationView: AccessibilityActionsSource {
 
 extension TabLocationView: Themeable {
     var themeableChildren: [Themeable?]? {
-        return [reloadButton]
+        return [reloadButton, settingsButton]
     }
     
     func applyTheme(_ theme: Theme) {

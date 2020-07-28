@@ -49,11 +49,11 @@ class SearchEngines {
     fileprivate let fileAccessor: FileAccessor
 
     static let defaultRegionSearchEngines = [
-        "DE": OpenSearchEngine.EngineNames.duckDuckGo,
-        "FR": OpenSearchEngine.EngineNames.qwant,
-        "AU": OpenSearchEngine.EngineNames.duckDuckGo,
-        "NZ": OpenSearchEngine.EngineNames.duckDuckGo,
-        "IE": OpenSearchEngine.EngineNames.duckDuckGo,
+        "DE": OpenSearchEngine.EngineNames.netguide,
+        "FR": OpenSearchEngine.EngineNames.netguide,
+        "AU": OpenSearchEngine.EngineNames.netguide,
+        "NZ": OpenSearchEngine.EngineNames.netguide,
+        "IE": OpenSearchEngine.EngineNames.netguide,
     ]
     
     init(files: FileAccessor) {
@@ -89,11 +89,7 @@ class SearchEngines {
     
     /// Whether or not we should show DuckDuckGo related promotions based on the users current region
     static var shouldShowDuckDuckGoPromo: Bool {
-        // We want to show ddg promo in most cases so guard returns true.
-        guard let region = Locale.current.regionCode,
-            let searchEngine = defaultRegionSearchEngines[region] else { return true }
-        
-        return searchEngine == OpenSearchEngine.EngineNames.duckDuckGo
+        return false
     }
 
     func setDefaultEngine(_ engine: String, forType type: DefaultEngineType) {

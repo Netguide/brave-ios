@@ -12,7 +12,7 @@ class SearchEnginesTests: XCTestCase {
     
     private let DefaultSearchEngineName = "Google"
     // BRAVE TODO: This list is not accurate because Brave uses many more engines
-    private let ExpectedEngineNames = ["Qwant", "Bing", "DuckDuckGo", "Google", "StartPage"]
+    private let ExpectedEngineNames = ["Netguide", "Bing", "DuckDuckGo", "Google", "StartPage"]
     
     override func setUp() {
         super.setUp()
@@ -178,12 +178,12 @@ class SearchEnginesTests: XCTestCase {
     }
 
     func testUnorderedSearchEngines() {
-        let unorderedList = ["Google", "Yahoo", "Bing", "DuckDuckGo", "Qwant", "StartPage"]
+        let unorderedList = ["Google", "Yahoo", "Bing", "DuckDuckGo", "Netguide", "StartPage"]
         ["zh-TW", "en-CA", "de-DE", "en-US"].forEach {
             XCTAssertEqual(SearchEngines.getUnorderedBundledEnginesFor(locale: Locale(identifier: $0)).compactMap({$0.shortName}), unorderedList)
         }
         
-        let russianList = ["Google", "Яндекс", "DuckDuckGo", "Qwant", "StartPage"]
+        let russianList = ["Google", "Яндекс", "DuckDuckGo", "Netguide", "StartPage"]
         XCTAssertEqual(SearchEngines.getUnorderedBundledEnginesFor(locale: Locale(identifier: "ru")).compactMap({$0.shortName}), russianList)
     }
 
@@ -207,7 +207,7 @@ class SearchEnginesTests: XCTestCase {
         expectddgClientName(locales: ["en-US, pl-PL"],
                             expectedClientName: OpenSearchEngine.defaultSearchClientName, profile: profile)
         
-        XCTAssert(getQwant(profile: profile).searchURLForQuery("test")!.absoluteString.contains("client=brz-brave"))
+        XCTAssert(getNetguide(profile: profile).searchURLForQuery("test")!.absoluteString.contains("client=brz-brave"))
     }
     
     func testSearchEngineParamsExistingUser() {
@@ -219,7 +219,7 @@ class SearchEnginesTests: XCTestCase {
         expectddgClientName(locales: ["en-US, pl-PL"],
                             expectedClientName: OpenSearchEngine.defaultSearchClientName, profile: profile)
         
-        XCTAssert(getQwant(profile: profile).searchURLForQuery("test")!.absoluteString.contains("client=brz-brave"))
+        XCTAssert(getNetguide(profile: profile).searchURLForQuery("test")!.absoluteString.contains("client=brz-brave"))
     }
     
     private func expectddgClientName(locales: [String], expectedClientName: String, profile: Profile) {
@@ -245,9 +245,9 @@ class SearchEnginesTests: XCTestCase {
          })!
     }
     
-    private func getQwant(profile: Profile) -> OpenSearchEngine {
+    private func getNetguide(profile: Profile) -> OpenSearchEngine {
          return profile.searchEngines.orderedEngines.first(where: {
-            $0.shortName == OpenSearchEngine.EngineNames.qwant
+            $0.shortName == OpenSearchEngine.EngineNames.netguide
          })!
     }
 }

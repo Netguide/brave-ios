@@ -14,8 +14,7 @@ class OpenSearchEngine: NSObject, NSSecureCoding {
     static let preferredIconSize = 30
     
     struct EngineNames {
-        static let duckDuckGo = "DuckDuckGo"
-        static let qwant = "Qwant"
+        static let netguide = "Netguide"
     }
     
     static let defaultSearchClientName = "brave"
@@ -160,7 +159,7 @@ class OpenSearchEngine: NSObject, NSSecureCoding {
     }
     
     private func regionalClientParam(_ locale: Locale) -> String {
-        if shortName == EngineNames.duckDuckGo, let region = locale.regionCode {
+        if shortName == EngineNames.netguide, let region = locale.regionCode {
             switch region {
             case "AU", "IE", "NZ": return "braveed"
             case "DE": return "bravened"
