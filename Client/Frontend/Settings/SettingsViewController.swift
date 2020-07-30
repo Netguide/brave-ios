@@ -104,9 +104,9 @@ class SettingsViewController: TableViewController {
                                  supportSection,
                                  aboutSection])
         
-        if let debugSection = debugSection {
-            //list.append(debugSection)
-        }
+        /*if let debugSection = debugSection {
+            list.append(debugSection)
+        }*/
 
         return list
     }

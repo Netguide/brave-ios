@@ -2,7 +2,7 @@
 
 public struct BraveUX {    
     public static let braveCommunityURL = URL(string: "https://community.brave.com/")!
-    public static let bravePrivacyURL = URL(string: "https://www.netguide.com/#Confidentialité")!
+    public static let bravePrivacyURL = URL(string: "https://www.netguide.com/#Confidentialit%c3%a9")!
     public static let braveTermsOfUseURL = URL(string: "https://www.netguide.com/#Conditions")!
     public static let prefKeyOptInDialogWasSeen = "OptInDialogWasSeen"
     public static let prefKeyUserAllowsTelemetry = "userallowstelemetry"
@@ -13,7 +13,8 @@ public struct BraveUX {
     
     public static let readerModeBarHeight = 28
     
-    public static let braveOrange = UIColor(rgb: 0xfb542b)
+    //public static let braveOrange = UIColor(rgb: 0xfb542b)
+    public static let braveOrange = UIColor(rgb: 0x0f6bb1)
     
     public static let blue = UIColor(rgb: 0x424acb)
     public static let lightBlue = UIColor(rgb: 0x4A90E2)

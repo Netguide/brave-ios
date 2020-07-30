@@ -5,19 +5,19 @@
       "scale" : "1x"
     },
     {
+      "filename" : "add-tab-netguide-42.png",
       "idiom" : "universal",
-      "filename" : "add-tab-netguide-36.png",
       "scale" : "2x"
     },
     {
+      "filename" : "add-tab-netguide-63.png",
       "idiom" : "universal",
-      "filename" : "add-tab-netguide-54.png",
       "scale" : "3x"
     }
   ],
   "info" : {
-    "version" : 1,
-    "author" : "xcode"
+    "author" : "xcode",
+    "version" : 1
   },
   "properties" : {
     "template-rendering-intent" : "template"

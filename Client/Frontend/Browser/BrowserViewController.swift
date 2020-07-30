@@ -1538,21 +1538,61 @@ class BrowserViewController: UIViewController {
 
     func openNetguideTab(attemptLocationFieldFocus: Bool, isPrivate: Bool = false, searchFor searchText: String? = nil) {
         popToBVC()
-        
+        //TODO: check scroll position scrolltop or go to home page
         var done = false
         
         for tab in tabManager.tabsForCurrentMode where tab.url?.host == "www.netguide.com" {
             if tab.id == tabManager.selectedTab?.id {
-                tabManager.reloadSelectedTab()
-                done = true
                 
+                var urlString = "https://www.netguide.com/#MobileApp"
+                
+                if tab.type == .private {
+                    urlString = "https://www.netguide.com/#PrivateMobileApp"
+                }
+                
+                if tabManager.selectedTab?.url?.absoluteString == "https://www.netguide.com/" {
+                    if let webView = tab.webView,
+                        let url = URL(string: urlString) {
+                        webView.load(URLRequest(url: url))
+                    }
+                } else if tabManager.selectedTab?.url?.absoluteString.hasPrefix("https://www.netguide.com/#") ?? false {
+                    if let webView = tab.webView,
+                        let url = URL(string: urlString) {
+                        webView.load(URLRequest(url: url))
+                    }
+                } else {
+                    if let webView = tab.webView {
+                        
+                        let yScroll = webView.scrollView.contentOffset.y
+                        
+                        if yScroll == 0 {
+                            if let url = URL(string: urlString) {
+                                webView.load(URLRequest(url: url))
+                            }
+                        } else {
+                            webView.scrollView.setContentOffset(CGPoint.zero, animated: true)
+                        }
+                    }
+                }
+                
+                done = true
+                break
             } else {
+                if let selectedTab = tabManager.selectedTab {
+                    tabManager.removeTab(selectedTab)
+                }
+
                 tabManager.selectTab(tab)
                 done = true
+                break
             }
         }
         
         if !done {
+            if let selectedTab = tabManager.selectedTab {
+                tabManager.removeTab(selectedTab)
+            }
+            
             self.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
         }
     }
@@ -1757,7 +1797,7 @@ class BrowserViewController: UIViewController {
         }
 
         // Do not show ddg popup if user already chose it for private browsing.
-        if profile.searchEngines.defaultEngine(forType: .privateMode).shortName == OpenSearchEngine.EngineNames.duckDuckGo {
+        if profile.searchEngines.defaultEngine(forType: .privateMode).shortName == OpenSearchEngine.EngineNames.netguide {
             return
         }
         
@@ -1775,7 +1815,7 @@ class BrowserViewController: UIViewController {
             self.duckDuckGoPopup = nil
             
             Preferences.Popups.duckDuckGoPrivateSearch.value = true
-            self.profile.searchEngines.setDefaultEngine(OpenSearchEngine.EngineNames.duckDuckGo, forType: .privateMode)
+            self.profile.searchEngines.setDefaultEngine(OpenSearchEngine.EngineNames.netguide, forType: .privateMode)
             
             self.tabManager.selectedTab?.newTabPageViewController?.updateDuckDuckGoVisibility()
             

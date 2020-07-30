@@ -24,8 +24,9 @@ struct UX {
         static let statTitleColor = UIColor(rgb: 0x8C9094)
     }
 
-    static let braveOrange = UIColor(rgb: 0xfb542b)
-    
+    //static let braveOrange = UIColor(rgb: 0xfb542b)
+    static let braveOrange = UIColor(rgb: 0x0f6bb1)
+
     static let blue = UIColor(rgb: 0x424acb)
     static let lightBlue = UIColor(rgb: 0x4A90E2)
     static let purple = UIColor(rgb: 0x8236b9)

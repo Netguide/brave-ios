@@ -266,7 +266,7 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
         searchButton.setImage(#imageLiteral(resourceName: "quickSearch"), for: [])
         searchButton.imageView?.contentMode = .center
         searchButton.layer.backgroundColor = SearchViewControllerUX.engineButtonBackgroundColor
-        searchButton.addTarget(self, action: #selector(didClickSearchButton), for: .touchUpInside)
+        //searchButton.addTarget(self, action: #selector(didClickSearchButton), for: .touchUpInside)
         searchButton.accessibilityLabel = Strings.searchSettingsButtonTitle
 
         searchButton.imageView?.snp.makeConstraints { make in

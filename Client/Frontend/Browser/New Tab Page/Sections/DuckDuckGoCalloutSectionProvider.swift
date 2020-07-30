@@ -88,7 +88,7 @@ class DuckDuckGoCalloutSectionProvider: NSObject, NTPObservableSectionProvider {
     }
     
     private var isShowingCallout: Bool {
-        let isSearchEngineSet = profile.searchEngines.defaultEngine(forType: .privateMode).shortName == OpenSearchEngine.EngineNames.duckDuckGo
+        let isSearchEngineSet = profile.searchEngines.defaultEngine(forType: .privateMode).shortName == OpenSearchEngine.EngineNames.netguide
         let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
         let shouldShowPromo = SearchEngines.shouldShowDuckDuckGoPromo
         return isPrivateBrowsing && !isSearchEngineSet && shouldShowPromo
