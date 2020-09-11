@@ -29,6 +29,7 @@ extension ToolbarProtocol {
     
     func updateBackStatus(_ canGoBack: Bool) {
         backButton.isEnabled = canGoBack
+        /*backButton.isEnabled = true*/
     }
     
     func updateForwardStatus(_ canGoForward: Bool) {

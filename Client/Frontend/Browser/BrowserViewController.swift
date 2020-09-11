@@ -96,6 +96,7 @@ class BrowserViewController: UIViewController {
     var header: UIStackView!
     var footer: UIView!
     fileprivate var topTouchArea: UIButton!
+    fileprivate var bottomTouchArea: UIButton!
     
     // These constraints allow to show/hide tabs bar
     var webViewContainerTopOffset: Constraint?
@@ -433,7 +434,16 @@ class BrowserViewController: UIViewController {
         if let tab = tabManager.selectedTab,
                let webView = tab.webView {
             updateURLBar()
-            navigationToolbar.updateBackStatus(webView.canGoBack)
+            
+            var canGoBackNetguide = webView.canGoBack
+            
+            if canGoBackNetguide == false {
+                if tab.parent?.url?.host == "www.netguide.com" {
+                    canGoBackNetguide = true
+                }
+            }
+            
+            navigationToolbar.updateBackStatus(canGoBackNetguide)
             navigationToolbar.updateForwardStatus(webView.canGoForward)
             topToolbar.locationView.loading = tab.loading
         }
@@ -560,6 +570,11 @@ class BrowserViewController: UIViewController {
         topTouchArea.addTarget(self, action: #selector(tappedTopArea), for: .touchUpInside)
         view.addSubview(topTouchArea)
 
+        bottomTouchArea = UIButton()
+        bottomTouchArea.isAccessibilityElement = false
+        bottomTouchArea.addTarget(self, action: #selector(tappedTopArea), for: .touchUpInside)
+        view.addSubview(bottomTouchArea)
+        
         // Setup the URL bar, wrapped in a view to get transparency effect
         topToolbar = TopToolbarView()
         topToolbar.translatesAutoresizingMaskIntoConstraints = false
@@ -717,7 +732,11 @@ class BrowserViewController: UIViewController {
             make.top.left.right.equalTo(self.view)
             make.height.equalTo(BrowserViewControllerUX.showHeaderTapAreaHeight)
         }
-
+        
+        bottomTouchArea.snp.makeConstraints { make in
+            make.bottom.left.right.equalTo(self.view)
+            make.height.equalTo(BrowserViewControllerUX.showHeaderTapAreaHeight)
+        }
     }
 
     override func viewDidLayoutSubviews() {
@@ -1351,11 +1370,20 @@ class BrowserViewController: UIViewController {
                 navigateInTab(tab: tab)
             }
         case .canGoBack:
+            
             guard tab === tabManager.selectedTab, let canGoBack = change?[.newKey] as? Bool else {
                 break
             }
             
-            navigationToolbar.updateBackStatus(canGoBack)
+            var canGoBackNetguide = canGoBack
+            
+            if canGoBackNetguide == false {
+                if tabManager.selectedTab?.parent?.url?.host == "www.netguide.com" {
+                    canGoBackNetguide = true
+                }
+            }
+            
+            navigationToolbar.updateBackStatus(canGoBackNetguide)
         case .canGoForward:
             guard tab === tabManager.selectedTab, let canGoForward = change?[.newKey] as? Bool else {
                 break
@@ -1538,62 +1566,59 @@ class BrowserViewController: UIViewController {
 
     func openNetguideTab(attemptLocationFieldFocus: Bool, isPrivate: Bool = false, searchFor searchText: String? = nil) {
         popToBVC()
-        //TODO: check scroll position scrolltop or go to home page
-        var done = false
         
-        for tab in tabManager.tabsForCurrentMode where tab.url?.host == "www.netguide.com" {
-            if tab.id == tabManager.selectedTab?.id {
-                
-                var urlString = "https://www.netguide.com/#MobileApp"
-                
-                if tab.type == .private {
-                    urlString = "https://www.netguide.com/#PrivateMobileApp"
+        if tabManager.selectedTab?.url?.host == "www.netguide.com" {
+            var urlString = "https://www.netguide.com/#MobileApp"
+            
+            if tabManager.selectedTab?.type == .private {
+                urlString = "https://www.netguide.com/#PrivateMobileApp"
+            }
+            
+            if tabManager.selectedTab?.url?.absoluteString == "https://www.netguide.com/" ||
+                (tabManager.selectedTab?.url?.absoluteString.hasPrefix("https://www.netguide.com/#") ?? false) {
+                if let webView = tabManager.selectedTab?.webView,
+                    let url = URL(string: urlString) {
+                    webView.load(URLRequest(url: url))
                 }
-                
-                if tabManager.selectedTab?.url?.absoluteString == "https://www.netguide.com/" {
-                    if let webView = tab.webView,
-                        let url = URL(string: urlString) {
-                        webView.load(URLRequest(url: url))
-                    }
-                } else if tabManager.selectedTab?.url?.absoluteString.hasPrefix("https://www.netguide.com/#") ?? false {
-                    if let webView = tab.webView,
-                        let url = URL(string: urlString) {
-                        webView.load(URLRequest(url: url))
-                    }
-                } else {
-                    if let webView = tab.webView {
-                        
-                        let yScroll = webView.scrollView.contentOffset.y
-                        
-                        if yScroll == 0 {
-                            if let url = URL(string: urlString) {
-                                webView.load(URLRequest(url: url))
-                            }
-                        } else {
-                            webView.scrollView.setContentOffset(CGPoint.zero, animated: true)
-                        }
-                    }
-                }
-                
-                done = true
-                break
             } else {
+                if let webView = tabManager.selectedTab?.webView {
+                    
+                    let yScroll = webView.scrollView.contentOffset.y
+                    
+                    if yScroll == 0 {
+                        if let url = URL(string: urlString) {
+                            webView.load(URLRequest(url: url))
+                        }
+                    } else {
+                        webView.scrollView.setContentOffset(CGPoint.zero, animated: true)
+                    }
+                }
+            }
+        } else {
+            
+            var parenttabfound = false
+            
+            if let parenttab = tabManager.selectedTab?.parent {
+                
+                for tab in tabManager.tabsForCurrentMode where tab.id == parenttab.id {
+                    parenttabfound = true
+                }
+                
+                if parenttabfound {
+                    if let selectedTab = tabManager.selectedTab {
+                        tabManager.selectTab(parenttab)
+                        tabManager.removeTab(selectedTab)
+                    }
+                }
+            }
+            
+            if parenttabfound == false {
                 if let selectedTab = tabManager.selectedTab {
                     tabManager.removeTab(selectedTab)
                 }
-
-                tabManager.selectTab(tab)
-                done = true
-                break
+                
+                self.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
             }
-        }
-        
-        if !done {
-            if let selectedTab = tabManager.selectedTab {
-                tabManager.removeTab(selectedTab)
-            }
-            
-            self.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
         }
     }
     
@@ -2119,7 +2144,26 @@ extension BrowserViewController: ToolbarDelegate {
     }
     
     func tabToolbarDidPressBack(_ tabToolbar: ToolbarProtocol, button: UIButton) {
-        tabManager.selectedTab?.goBack()
+        if tabManager.selectedTab?.canGoBack == true {
+            tabManager.selectedTab?.goBack()
+        } else {
+            
+            var parenttabfound = false
+            
+            if let parenttab = tabManager.selectedTab?.parent {
+                
+                for tab in tabManager.tabsForCurrentMode where tab.id == parenttab.id {
+                    parenttabfound = true
+                }
+                
+                if parenttabfound {
+                    if let selectedTab = tabManager.selectedTab {
+                        tabManager.selectTab(parenttab)
+                        tabManager.removeTab(selectedTab)
+                    }
+                }
+            }
+        }
     }
 
     func tabToolbarDidLongPressBack(_ tabToolbar: ToolbarProtocol, button: UIButton) {
@@ -2498,7 +2542,17 @@ extension BrowserViewController: TabManagerDelegate {
         updateTabsBarVisibility()
 
         topToolbar.locationView.loading = selected?.loading ?? false
-        navigationToolbar.updateBackStatus(selected?.canGoBack ?? false)
+        
+        var canGoBackNetguide = selected?.canGoBack ?? false
+        
+        if canGoBackNetguide == false {
+            if selected?.parent?.url?.host == "www.netguide.com" {
+                canGoBackNetguide = true
+            }
+        }
+        
+        navigationToolbar.updateBackStatus(canGoBackNetguide)
+        
         navigationToolbar.updateForwardStatus(selected?.canGoForward ?? false)
         
         if let readerMode = selected?.getContentScript(name: ReaderMode.name()) as? ReaderMode {

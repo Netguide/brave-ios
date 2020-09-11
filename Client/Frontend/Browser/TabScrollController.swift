@@ -109,6 +109,7 @@ class TabScrollingController: NSObject {
             return
         }
         toolbarState = .collapsed
+
         let durationRatio = abs((topScrollHeight + headerTopOffset) / topScrollHeight)
         let actualDuration = TimeInterval(ToolbarBaseAnimationDuration * durationRatio)
         self.animateToolbarsWithOffsets(
@@ -283,6 +284,7 @@ extension TabScrollingController: UIScrollViewDelegate {
                 showToolbars(animated: !isTabShowingPDF)
             } else if scrollDirection == .down {
                 hideToolbars(animated: !isTabShowingPDF)
+                /*showToolbars(animated: !isTabShowingPDF)*/
             }
         }
     }
