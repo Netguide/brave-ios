@@ -12,7 +12,6 @@ import SnapKit
 import XCGLogger
 import MobileCoreServices
 import SwiftyJSON
-import Deferred
 import Data
 import BraveShared
 import SwiftKeychainWrapper
@@ -21,6 +20,7 @@ import BraveRewards
 import StoreKit
 import SafariServices
 import BraveUI
+import NetworkExtension
 
 private let log = Logger.browserLogger
 
@@ -59,6 +59,7 @@ class BrowserViewController: UIViewController {
     
     // Single data source used for all favorites vcs
     let backgroundDataSource = NTPDataSource()
+    let feedDataSource = FeedDataSource()
     
     var loadQueue = Deferred<Void>()
 
@@ -142,6 +143,8 @@ class BrowserViewController: UIViewController {
     let rewardsObserver: LedgerObserver
     private var notificationsHandler: AdsNotificationHandler?
     private(set) var publisher: PublisherInfo?
+    
+    let vpnProductInfo = VPNProductInfo()
 
     init(profile: Profile, tabManager: TabManager, crashedLastSession: Bool,
          safeBrowsingManager: SafeBrowsing? = SafeBrowsing()) {
@@ -150,8 +153,7 @@ class BrowserViewController: UIViewController {
         self.readerModeCache = ReaderMode.cache(for: tabManager.selectedTab)
         self.crashedLastSession = crashedLastSession
         self.safeBrowsing = safeBrowsingManager
-        
-        RewardsHelper.configureRewardsLogs()
+
         let configuration: BraveRewardsConfiguration
         if AppConstants.buildChannel.isPublic {
             configuration = .production
@@ -168,9 +170,15 @@ class BrowserViewController: UIViewController {
                     configuration = .staging
                 }
             } else {
-                configuration = AppConstants.buildChannel == .developer ? .staging : .production
+                configuration = AppConstants.buildChannel == .debug ? .staging : .production
             }
         }
+
+        configuration.buildChannel = BraveAdsBuildChannel().then {
+          $0.name = AppConstants.buildChannel.rawValue
+          $0.isRelease = AppConstants.buildChannel == .release
+        }
+
         rewards = BraveRewards(configuration: configuration)
         if !BraveRewards.isAvailable {
             // Disable rewards services in case previous user already enabled
@@ -183,6 +191,8 @@ class BrowserViewController: UIViewController {
 
         super.init(nibName: nil, bundle: nil)
         didInit()
+        
+        rewards.delegate = self
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -507,6 +517,11 @@ class BrowserViewController: UIViewController {
             presentedViewController?.view.alpha = 0
         }
     }
+    
+    @objc func vpnConfigChanged() {
+        // Load latest changes to the vpn.
+        NEVPNManager.shared().loadFromPreferences { _ in }
+    }
 
     @objc func appDidBecomeActiveNotification() {
         // Re-show any components that might have been hidden because they were being displayed
@@ -536,6 +551,8 @@ class BrowserViewController: UIViewController {
                            name: UIApplication.didEnterBackgroundNotification, object: nil)
             $0.addObserver(self, selector: #selector(resetNTPNotification),
                            name: .adsOrRewardsToggledInSettings, object: nil)
+            $0.addObserver(self, selector: #selector(vpnConfigChanged),
+                           name: .NEVPNConfigurationChange, object: nil)
             
         }
         
@@ -634,7 +651,7 @@ class BrowserViewController: UIViewController {
         let dropInteraction = UIDropInteraction(delegate: self)
         view.addInteraction(dropInteraction)
         
-        initializeSyncWebView()
+        deprecateSyncV1()
         
         if AppConstants.buildChannel.isPublic && AppReview.shouldRequestReview() {
             // Request Review when the main-queue is free or on the next cycle.
@@ -646,33 +663,32 @@ class BrowserViewController: UIViewController {
         Bookmark.restore_1_12_Bookmarks() {
             log.info("Bookmarks from old database were successfully restored")
         }
+        
+        vpnProductInfo.load()
+        BraveVPN.initialize()
     }
     
-    /// Initialize Sync without connecting. Sync webview needs to be in a "permanent" location
-    /// to continue working predictably. If Sync is not in the view "hierarchy"
-    /// it will behavior extremely unpredictably, often just dying in the middle of a promize chain.
-    /// Added to keyWindow, since it can then be utilized from any VC (e.g. settings modal).
-    /// This also inits sync at app launch.
-    private func initializeSyncWebView() {
+    private func deprecateSyncV1() {
         let sync = Sync.shared
         
-        #if NO_SYNC
         if sync.syncSeedArray == nil { return }
         
-        let msg = """
-            Sync has been disabled, as it will not be included in the next couple of production builds.
-            Your iOS device has been auto-removed from any sync groups.
-        """
+        sync.leaveSyncGroup()
         
-        let alert = UIAlertController(title: "Sync Disabled", message: msg, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
-        present(alert, animated: true, completion: nil)
-        #endif
-        
-        DispatchQueue.main.async {
-            sync.webView.alpha = CGFloat.leastNormalMagnitude
-            UIApplication.shared.keyWindow?.insertSubview(Sync.shared.webView, at: 0)
+        let alert = UIAlertController(title: "", message: Strings.Sync.syncV1DeprecationText,
+                                      preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
+        let learnMoreAction = UIAlertAction(title: Strings.learnMore, style: .default) { [weak self] _ in
+            guard let syncDeprecationUrl = URL(string: "https://brave.com/sync-v2-is-coming") else {
+                log.error("Failed to unwrap sync deprecation url")
+                return
+            }
+            
+            self?.tabManager.addTabAndSelect(URLRequest(url: syncDeprecationUrl),
+                                            isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
         }
+        alert.addAction(learnMoreAction)
+        present(alert, animated: true)
     }
     
     fileprivate func setupTabs() {
@@ -783,6 +799,9 @@ class BrowserViewController: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         presentOnboardingIntro()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            self.presentVPNCallout()
+        }
         
         screenshotHelper.viewIsVisible = true
         screenshotHelper.takePendingScreenshots(tabManager.allTabs)
@@ -813,121 +832,14 @@ class BrowserViewController: UIViewController {
     }
     
     func presentOnboardingIntro() {
-        // 1. Existing user.
-        // 2. User already completed onboarding.
-        if Preferences.General.basicOnboardingCompleted.value == OnboardingState.completed.rawValue {
-            // The user has ads in their region and they completed all onboarding.
-            if BraveAds.isCurrentLocaleSupported()
-                &&
-                Preferences.General.basicOnboardingProgress.value == OnboardingProgress.ads.rawValue {
-                return
-            }
-            
-            // The user doesn't have ads in their region and they've completed rewards.
-            if !BraveAds.isCurrentLocaleSupported()
-                &&
-                Preferences.General.basicOnboardingProgress.value == OnboardingProgress.rewards.rawValue {
-                return
-            }
-        }
-        
-        // The user either skipped or didn't complete onboarding.
-        let isRewardsEnabled = rewards.ledger.isEnabled
-        let currentProgress = OnboardingProgress(rawValue: Preferences.General.basicOnboardingProgress.value) ?? .none
-        
-        // 1. Existing user.
-        // 2. The user skipped onboarding before.
-        // 3. 60 days have passed since they last saw onboarding.
-        if Preferences.General.basicOnboardingCompleted.value == OnboardingState.skipped.rawValue {
-
-            guard let daysUntilNextPrompt = Preferences.General.basicOnboardingNextOnboardingPrompt.value else {
-                return
-            }
-            
-            // 60 days has passed since the user last saw the onboarding.. it's time to show the onboarding again..
-            if daysUntilNextPrompt <= Date() {
-                guard let onboarding = OnboardingNavigationController(
-                    profile: profile,
-                    onboardingType: rewards.ledger.isEnabled ? .existingUserRewardsOn(currentProgress) : .existingUserRewardsOff(currentProgress),
-                    rewards: rewards,
-                    theme: Theme.of(tabManager.selectedTab)
-                    ) else { return }
-                
-                onboarding.onboardingDelegate = self
-                present(onboarding, animated: true)
-                
-                Preferences.General.basicOnboardingNextOnboardingPrompt.value = Date(timeIntervalSinceNow: BrowserViewController.onboardingDaysInterval)
-            }
-            
-            return
-        }
-        
-        // 1. Rewards are on/off (existing user)
-        // 2. User hasn't seen the rewards part of the onboarding yet.
-        if (Preferences.General.basicOnboardingCompleted.value == OnboardingState.completed.rawValue)
-            &&
-            (Preferences.General.basicOnboardingProgress.value == OnboardingProgress.searchEngine.rawValue) {
-            
-            guard let onboarding = OnboardingNavigationController(
-                profile: profile,
-                onboardingType: isRewardsEnabled ? .existingUserRewardsOn(currentProgress) : .existingUserRewardsOff(currentProgress),
-                rewards: rewards,
-                theme: Theme.of(tabManager.selectedTab)
-                ) else { return }
-            
-            onboarding.onboardingDelegate = self
-            present(onboarding, animated: true)
-            return
-        }
-        
-        // 1. Rewards are on/off (existing user)
-        // 2. User hasn't seen the rewards part of the onboarding yet because their version of the app is insanely OLD and somehow the progress value doesn't exist.
-        if (Preferences.General.basicOnboardingCompleted.value == OnboardingState.completed.rawValue)
-            &&
-            (Preferences.General.basicOnboardingProgress.value == OnboardingProgress.none.rawValue) {
-            
-            guard let onboarding = OnboardingNavigationController(
-                profile: profile,
-                onboardingType: isRewardsEnabled ? .existingUserRewardsOn(currentProgress) : .existingUserRewardsOff(currentProgress),
-                rewards: rewards,
-                theme: Theme.of(tabManager.selectedTab)
-                ) else { return }
-            
-            onboarding.onboardingDelegate = self
-            present(onboarding, animated: true)
-            return
-        }
-        
-        // 1. Rewards are on/off (existing user)
-        // 2. Ads are now available
-        // 3. User hasn't seen the ads part of onboarding yet
-        if BraveAds.isCurrentLocaleSupported()
-            &&
-            (Preferences.General.basicOnboardingCompleted.value == OnboardingState.completed.rawValue)
-            &&
-            (Preferences.General.basicOnboardingProgress.value != OnboardingProgress.ads.rawValue) {
-            
-            guard let onboarding = OnboardingNavigationController(
-                profile: profile,
-                onboardingType: isRewardsEnabled ? .existingUserRewardsOn(currentProgress) : .existingUserRewardsOff(currentProgress),
-                rewards: rewards,
-                theme: Theme.of(tabManager.selectedTab)
-                ) else { return }
-            
-            onboarding.onboardingDelegate = self
-            present(onboarding, animated: true)
-            return
-        }
-        
         // 1. User is brand new
         // 2. User hasn't completed onboarding
         // 3. We don't care how much progress they made. Onboarding is only complete when ALL of it is complete.
-        if Preferences.General.basicOnboardingCompleted.value != OnboardingState.completed.rawValue {
+        if Preferences.General.basicOnboardingCompleted.value == OnboardingState.unseen.rawValue {
             // The user has never completed the onboarding..
             
             guard let onboarding = OnboardingNavigationController(
                 profile: profile,
-                onboardingType: .newUser(currentProgress),
                 rewards: rewards,
                 theme: Theme.of(tabManager.selectedTab)
                 ) else { return }
@@ -936,6 +848,46 @@ class BrowserViewController: UIViewController {
             present(onboarding, animated: true)
             return
         }
+    }
+    
+    private func presentVPNCallout() {
+        let onboardingNotCompleted =
+            Preferences.General.basicOnboardingCompleted.value == OnboardingState.completed.rawValue
+        let notEnoughAppLaunches = Preferences.VPN.appLaunchCountForVPNPopup.value < BraveVPN.appLaunchesToShowVPNPopup
+        let showedPopup = Preferences.VPN.popupShowed
+
+        if onboardingNotCompleted
+            || notEnoughAppLaunches
+            || showedPopup.value
+            || !VPNProductInfo.isComplete {
+            return
+        }
+        
+        let popup = EnableVPNPopupViewController().then {
+            if #available(iOS 13.0, *) {
+                $0.isModalInPresentation = true
+            }
+            $0.modalPresentationStyle = .overFullScreen
+        }
+        
+        popup.enableVPNTapped = { [weak self] in
+            guard let vc = BraveVPN.vpnState.enableVPNDestinationVC else { return }
+            let nav = DismissableNavigationViewController(rootViewController: vc)
+            nav.navigationBar.topItem?.leftBarButtonItem =
+                .init(barButtonSystemItem: .cancel, target: nav, action: #selector(nav.dismissViewController))
+            
+            let idiom = UIDevice.current.userInterfaceIdiom
+            if #available(iOS 13.0, *) {
+                nav.modalPresentationStyle = idiom == .phone ? .pageSheet : .formSheet
+            } else {
+                nav.modalPresentationStyle = idiom == .phone ? .fullScreen : .formSheet
+            }
+            self?.present(nav, animated: true)
+        }
+        
+        present(popup, animated: false)
+        
+        showedPopup.value = true
     }
 
     // THe logic for shouldShowWhatsNewTab is as follows: If we do not have the LatestAppVersionProfileKey in
@@ -1082,6 +1034,7 @@ class BrowserViewController: UIViewController {
             let ntpController = NewTabPageViewController(tab: selectedTab,
                                                          profile: profile,
                                                          dataSource: backgroundDataSource,
+                                                         feedDataSource: feedDataSource,
                                                          rewards: rewards)
             ntpController.delegate = self
             selectedTab.newTabPageViewController = ntpController
@@ -1305,7 +1258,7 @@ class BrowserViewController: UIViewController {
         case .estimatedProgress:
             guard tab === tabManager.selectedTab,
                 let progress = change?[.newKey] as? Float else { break }
-            if !(webView.url?.isLocalUtility ?? false) {
+            if webView.url?.isLocalUtility == false {
                 topToolbar.updateProgressBar(progress)
             } else {
                 topToolbar.hideProgressBar()
@@ -1315,13 +1268,6 @@ class BrowserViewController: UIViewController {
             
             if tab === tabManager.selectedTab {
                 topToolbar.locationView.loading = tab.loading
-                if !(webView.url?.isLocalUtility ?? false) {
-                    if loading && topToolbar.currentProgress() < TopToolbarView.psuedoProgressValue {
-                        topToolbar.updateProgressBar(TopToolbarView.psuedoProgressValue)
-                    }
-                } else {
-                    topToolbar.hideProgressBar()
-                }
             }
             
             if !loading {
@@ -1590,6 +1536,36 @@ class BrowserViewController: UIViewController {
                 activities.append(addToFavoritesActivity)
             }
             activities.append(requestDesktopSiteActivity)
+            
+            #if compiler(>=5.3)
+            if #available(iOS 14.0, *), let webView = tab?.webView, tab?.temporaryDocument == nil {
+                let createPDFActivity = CreatePDFActivity(webView: webView) { [weak self] pdfData in
+                    guard let self = self else { return }
+                    // Create a valid filename
+                    let validFilenameSet = CharacterSet(charactersIn: ":/")
+                        .union(.newlines)
+                        .union(.controlCharacters)
+                        .union(.illegalCharacters)
+                    let filename = webView.title?.components(separatedBy: validFilenameSet).joined()
+                    let url = URL(fileURLWithPath: NSTemporaryDirectory())
+                        .appendingPathComponent("\(filename ?? "Untitled").pdf")
+                    do {
+                        try pdfData.write(to: url)
+                        let pdfActivityController = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+                        if let popoverPresentationController = pdfActivityController.popoverPresentationController {
+                            popoverPresentationController.sourceView = sourceView
+                            popoverPresentationController.sourceRect = sourceRect
+                            popoverPresentationController.permittedArrowDirections = arrowDirection
+                            popoverPresentationController.delegate = self
+                        }
+                        self.present(pdfActivityController, animated: true)
+                    } catch {
+                        log.error("Failed to write PDF to disk: \(error)")
+                    }
+                }
+                activities.append(createPDFActivity)
+            }
+            #endif
         }
         
         let controller = helper.createActivityViewController(items: activities) { [unowned self] completed, _ in
@@ -1754,7 +1730,7 @@ class BrowserViewController: UIViewController {
             self.duckDuckGoPopup = nil
             
             Preferences.Popups.duckDuckGoPrivateSearch.value = true
-            self.profile.searchEngines.setDefaultEngine(OpenSearchEngine.EngineNames.duckDuckGo, forType: .privateMode)
+            self.profile.searchEngines.updateDefaultEngine(OpenSearchEngine.EngineNames.duckDuckGo, forType: .privateMode)
             
             self.tabManager.selectedTab?.newTabPageViewController?.updateDuckDuckGoVisibility()
             
@@ -2012,6 +1988,9 @@ extension BrowserViewController: TopToolbarDelegate {
     
     func topToolbarDidTapBraveShieldsButton(_ topToolbar: TopToolbarView) {
         guard let selectedTab = tabManager.selectedTab else { return }
+        if selectedTab.url?.isLocalUtility == true {
+            return
+        }
         let shields = ShieldsViewController(tab: selectedTab)
         shields.shieldsSettingsChanged = { [unowned self] _ in
             // Reload this tab. This will also trigger an update of the brave icon in `TabLocationView` if
@@ -2021,7 +2000,32 @@ extension BrowserViewController: TopToolbarDelegate {
             // In 1.6 we "reload" the whole web view state, dumping caches, etc. (reload():BraveWebView.swift:495)
             // BRAVE TODO: Port over proper tab reloading with Shields
         }
-        let popover = PopoverController(contentController: shields, contentSizeBehavior: .preferredContentSize)
+        shields.showGlobalShieldsSettings = { [unowned self] vc in
+            vc.dismiss(animated: true) {
+                let shieldsAndPrivacy = BraveShieldsAndPrivacySettingsController(
+                    profile: self.profile,
+                    tabManager: self.tabManager,
+                    feedDataSource: self.feedDataSource
+                )
+                let container = SettingsNavigationController(rootViewController: shieldsAndPrivacy)
+                if #available(iOS 13.0, *) {
+                    container.isModalInPresentation = true
+                    container.modalPresentationStyle =
+                        UIDevice.current.userInterfaceIdiom == .phone ? .pageSheet : .formSheet
+                } else {
+                    container.modalPresentationStyle =
+                        UIDevice.current.userInterfaceIdiom == .phone ? .fullScreen : .formSheet
+                }
+                shieldsAndPrivacy.navigationItem.rightBarButtonItem = .init(
+                    barButtonSystemItem: .done,
+                    target: container,
+                    action: #selector(SettingsNavigationController.done)
+                )
+                self.present(container, animated: true)
+            }
+        }
+        let container = PopoverNavigationController(rootViewController: shields)
+        let popover = PopoverController(contentController: container, contentSizeBehavior: .preferredContentSize)
         popover.present(from: topToolbar.locationView.shieldsButton, on: self)
     }
     
@@ -2386,14 +2390,15 @@ extension BrowserViewController: TabManagerDelegate {
         if let tab = selected, let webView = tab.webView {
             updateURLBar()
             
-            if let url = tab.url, !url.isLocalUtility, webView.isLoading {
-                if webView.estimatedProgress > 0 {
-                    topToolbar.updateProgressBar(Float(webView.estimatedProgress))
-                } else {
-                    topToolbar.updateProgressBar(TopToolbarView.psuedoProgressValue)
+            if let url = tab.url, !url.isLocalUtility {
+                let previousEstimatedProgress = previous?.webView?.estimatedProgress ?? 1.0
+                let selectedEstimatedProgress = webView.estimatedProgress
+                
+                // Progress should be updated only if there's a difference between tabs.
+                // Otherwise we do nothing, so switching between fully loaded tabs won't show the animation.
+                if previousEstimatedProgress != selectedEstimatedProgress {
+                    topToolbar.updateProgressBar(Float(selectedEstimatedProgress))
                 }
-            } else {
-                topToolbar.hideProgressBar()
             }
 
             let newTheme = Theme.of(tab)
@@ -3255,7 +3260,7 @@ extension BrowserViewController {
         let alert = ThirdPartySearchAlerts.addThirdPartySearchEngine { alert in
             self.customSearchEngineButton.tintColor = UIColor.Photon.grey50
             self.customSearchEngineButton.isUserInteractionEnabled = false
-
+            
             WebImageCacheManager.shared.load(from: iconURL) { (image, _, _, _, _) in
                 guard let image = image else {
                     let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
@@ -3564,15 +3569,6 @@ extension BrowserViewController: PreferencesObserver {
             setupTabs()
             updateTabsBarVisibility()
             updateApplicationShortcuts()
-            if isPrivate { //When PBO is turned ON, we remove all tabs and configurations.
-                tabManager.removeAll()
-                tabManager.resetConfiguration()
-                
-                // Clear ALL data when going from normal mode to private
-                // The other way around is handled in `removeTab`
-                let clearables: [Clearable] = [CookiesAndCacheClearable()]
-                _ = ClearPrivateDataTableViewController.clearPrivateData(clearables)
-            }
         case Preferences.General.alwaysRequestDesktopSite.key:
             tabManager.reset()
             self.tabManager.reloadSelectedTab()
@@ -3629,43 +3625,7 @@ extension BrowserViewController {
 extension BrowserViewController: OnboardingControllerDelegate {
     func onboardingCompleted(_ onboardingController: OnboardingNavigationController) {
         Preferences.General.basicOnboardingCompleted.value = OnboardingState.completed.rawValue
-        Preferences.General.basicOnboardingNextOnboardingPrompt.value = nil
-        
-        if BraveRewards.isAvailable {
-            switch onboardingController.onboardingType {
-            case .newUser:
-                if BraveAds.isCurrentLocaleSupported() {
-                    Preferences.General.basicOnboardingProgress.value = OnboardingProgress.ads.rawValue
-                } else {
-                    Preferences.General.basicOnboardingProgress.value = OnboardingProgress.rewards.rawValue
-                }
-                
-            case .existingUserRewardsOff:
-                if BraveAds.isCurrentLocaleSupported() {
-                    Preferences.General.basicOnboardingProgress.value = OnboardingProgress.ads.rawValue
-                }
-                
-            case .existingUserRewardsOn:
-                if BraveAds.isCurrentLocaleSupported() {
-                    Preferences.General.basicOnboardingProgress.value = OnboardingProgress.ads.rawValue
-                }
-                
-            default:
-                break
-            }
-        } else {
-            switch onboardingController.onboardingType {
-            case .newUser:
-                Preferences.General.basicOnboardingProgress.value = OnboardingProgress.searchEngine.rawValue
-                
-            case .existingUserRewardsOff, .existingUserRewardsOn:
-                break
-                
-            default:
-                break
-            }
-        }
-        
+        Preferences.General.basicOnboardingProgress.value = OnboardingProgress.searchEngine.rawValue
         // Present private browsing prompt if necessary when onboarding has been completed
         onboardingController.dismiss(animated: true) {
             self.presentDuckDuckGoCalloutIfNeeded()
@@ -3674,7 +3634,6 @@ extension BrowserViewController: OnboardingControllerDelegate {
     
     func onboardingSkipped(_ onboardingController: OnboardingNavigationController) {
         Preferences.General.basicOnboardingCompleted.value = OnboardingState.skipped.rawValue
-        Preferences.General.basicOnboardingNextOnboardingPrompt.value = Date(timeIntervalSinceNow: BrowserViewController.onboardingDaysInterval)
         
         // Present private browsing prompt if necessary when onboarding has been skipped
         onboardingController.dismiss(animated: true) {

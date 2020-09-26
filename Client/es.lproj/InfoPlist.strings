@@ -21,9 +21,6 @@
 /* Privacy - Photo Library Additions Usage Description */
 "NSPhotoLibraryAddUsageDescription" = "Esto le permite guardar fotografías.";
 
-/* Privacy - Photo Library Usage Description */
-"NSPhotoLibraryUsageDescription" = "Esto le permite guardar y subir fotografías.";
-
 /* (No Comment) */
 "ShortcutItemTitleNewPrivateTab" = "Nueva pestaña privada";
 

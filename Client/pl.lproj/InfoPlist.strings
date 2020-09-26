@@ -21,9 +21,6 @@
 /* Privacy - Photo Library Additions Usage Description */
 "NSPhotoLibraryAddUsageDescription" = "Pozwala to na zapisywanie zdjęć.";
 
-/* Privacy - Photo Library Usage Description */
-"NSPhotoLibraryUsageDescription" = "Pozwala to na zapisywanie i przesyłanie zdjęć.";
-
 /* (No Comment) */
 "ShortcutItemTitleNewPrivateTab" = "Nowa karta w trybie prywatnym";
 

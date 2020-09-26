@@ -45,7 +45,7 @@ public class QASettingsViewController: TableViewController {
     $0.returnKeyType = .done
     $0.textAlignment = .right
     $0.keyboardType = .numberPad
-    $0.text = "\(BraveLedger.reconcileTime)"
+    $0.text = "\(BraveLedger.reconcileInterval)"
     $0.placeholder = "0"
   }
   
@@ -64,10 +64,10 @@ public class QASettingsViewController: TableViewController {
       alert.addAction(.init(title: "OK", style: .default, handler: nil))
       self.present(alert, animated: true)
       reconcileTimeTextField.text = "0"
-      BraveLedger.reconcileTime = 0
+      BraveLedger.reconcileInterval = 0
       return
     }
-    BraveLedger.reconcileTime = value
+    BraveLedger.reconcileInterval = value
   }
   
   private let adsDismissalTextField = UITextField().then {
@@ -111,7 +111,7 @@ public class QASettingsViewController: TableViewController {
     
     title = "Rewards QA Settings"
     
-    let isDefaultEnvironmentProd = AppConstants.buildChannel != .developer
+    let isDefaultEnvironmentProd = AppConstants.buildChannel != .debug
     
     let override: EnvironmentOverride = EnvironmentOverride(rawValue: Preferences.Rewards.environmentOverride.value) ?? .none
     segmentedControl.selectedSegmentIndex = EnvironmentOverride.sortedCases.firstIndex(of: override) ?? 0

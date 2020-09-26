@@ -4,7 +4,6 @@
 
 import Foundation
 import Shared
-import Deferred
 import WebKit
 
 private let log = Logger.browserLogger
@@ -19,7 +18,7 @@ public class UserReferralProgram {
     private static let clipboardPrefix = "F83AB73F-9852-4F01-ABA8-7830B8825993"
     
     struct HostUrl {
-        static let staging = "https://brave-laptop-updates-staging.herokuapp.com"
+        static let staging = "https://laptop-updates-staging.brave.com"
         static let prod = "https://laptop-updates.brave.com"
     }
     
@@ -42,7 +41,7 @@ public class UserReferralProgram {
         }
         
         // This should _probably_ correspond to the baseUrl for NTPDownloader
-        let host = AppConstants.buildChannel == .developer ? HostUrl.staging : HostUrl.prod
+        let host = AppConstants.buildChannel == .debug ? HostUrl.staging : HostUrl.prod
         
         guard let apiKey = getPlistString(for: UserReferralProgram.apiKeyPlistKey)?.trimmingCharacters(in: .whitespacesAndNewlines) else {
                 log.error("Urp init error, failed to get values from Brave.plist.")

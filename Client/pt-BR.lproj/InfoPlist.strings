@@ -21,9 +21,6 @@
 /* Privacy - Photo Library Additions Usage Description */
 "NSPhotoLibraryAddUsageDescription" = "Isso permite que você salve fotos.";
 
-/* Privacy - Photo Library Usage Description */
-"NSPhotoLibraryUsageDescription" = "Isso permite que você salve e carregue fotos.";
-
 /* (No Comment) */
 "ShortcutItemTitleNewPrivateTab" = "Nova aba privada";
 

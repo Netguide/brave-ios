@@ -21,9 +21,6 @@
 /* Privacy - Photo Library Additions Usage Description */
 "NSPhotoLibraryAddUsageDescription" = "Вы сможете сохранять фото.";
 
-/* Privacy - Photo Library Usage Description */
-"NSPhotoLibraryUsageDescription" = "Вы сможете сохранять и загружать фото.";
-
 /* (No Comment) */
 "ShortcutItemTitleNewPrivateTab" = "Новая приватная вкладка";
 

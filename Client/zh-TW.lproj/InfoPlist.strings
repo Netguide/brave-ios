@@ -21,9 +21,6 @@
 /* Privacy - Photo Library Additions Usage Description */
 "NSPhotoLibraryAddUsageDescription" = "這可讓您儲存相片。";
 
-/* Privacy - Photo Library Usage Description */
-"NSPhotoLibraryUsageDescription" = "這可讓您儲存並上傳相片。";
-
 /* (No Comment) */
 "ShortcutItemTitleNewPrivateTab" = "新增隱私分頁";
 

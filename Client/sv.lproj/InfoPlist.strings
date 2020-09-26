@@ -21,9 +21,6 @@
 /* Privacy - Photo Library Additions Usage Description */
 "NSPhotoLibraryAddUsageDescription" = "Det här låter dig spara foton.";
 
-/* Privacy - Photo Library Usage Description */
-"NSPhotoLibraryUsageDescription" = "Det här låter dig spara och ladda upp foton.";
-
 /* (No Comment) */
 "ShortcutItemTitleNewPrivateTab" = "Ny privat flik";
 

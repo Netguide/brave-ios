@@ -62,14 +62,14 @@ extension Preferences {
         /// If user kills the app before completing onboarding, it should be treated as unfinished.
         static let basicOnboardingCompleted = Option<Int>(key: "general.basic-onboarding-completed",
                                                           default: OnboardingState.undetermined.rawValue)
-        /// The time until the next on-boarding shows
-        static let basicOnboardingNextOnboardingPrompt = Option<Date?>(key: "general.basic-onboarding-days",
-                                                                      default: nil)
         
         /// The progress the user has made with onboarding
         static let basicOnboardingProgress = Option<Int>(key: "general.basic-onboarding-progress", default: OnboardingProgress.none.rawValue)
         /// Whether or not link preview upon long press action should be shown.
         static let enableLinkPreview = Option<Bool>(key: "general.night-mode", default: true)
+        
+        static let defaultBrowserCalloutDismissed =
+            Option<Bool>(key: "general.default-browser-callout-dismissed", default: false)
     }
     final class Search {
         /// Whether or not to show suggestions while the user types
@@ -133,6 +133,32 @@ extension Preferences {
         /// Tells the app whether we should try to fetch super referrer assets again in case of network error.
         static let superReferrerThemeRetryDeadline =
             Option<Date?>(key: "newtabpage.superreferrer-retry-deadline", default: nil)
+    }
+    
+    final class VPN {
+        static let popupShowed = Option<Bool>(key: "vpn.popup-showed", default: false)
+        static let appLaunchCountForVPNPopup = Option<Int>(key: "vpn.popup-launch-count", default: 0)
+        /// We get it from Guardian's servers.
+        static let lastPurchaseProductId = Option<String?>(key: "vpn.last-purchase-id", default: nil)
+        /// When the current subscription plan expires. It is nil if the user has not bought any vpn plan yet.
+        /// In case of receipt expiration this date might be set to some old date(like year 1970)
+        /// to make sure vpn expiration logic will be called.
+        static let expirationDate = Option<Date?>(key: "vpn.expiration-date", default: nil)
+        /// Whether free trial for the vpn expired for the user.
+        static let freeTrialUsed = Option<Bool>(key: "vpn.free-trial-used", default: false)
+        /// First time after user background the app after after installing vpn, we show a notification to say that the vpn
+        /// also works in background.
+        static let vpnWorksInBackgroundNotificationShowed =
+            Option<Bool>(key: "vpn.vpn-bg-notification-showed", default: false)
+        static let vpnSettingHeaderWasDismissed =
+            Option<Bool>(key: "vpn.vpn-header-dismissed", default: false)
+    }
+    
+    final class Debug {
+        /// When general blocklists were last time updated on the device.
+        static let lastGeneralAdblockUpdate = Option<Date?>(key: "last-general-adblock-update", default: nil)
+        /// When regional blocklists were last time updated on the device.
+        static let lastRegionalAdblockUpdate = Option<Date?>(key: "last-regional-adblock-update", default: nil)
     }
 }
 

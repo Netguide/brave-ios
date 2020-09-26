@@ -102,7 +102,9 @@ class WalletViewController: UIViewController, RewardsSummaryProtocol {
     updateExternalWallet()
     
     rewardsSummaryView.monthYearLabel.text = summaryPeriod
-    rewardsSummaryView.rows = summaryRows
+    summaryRows { [weak self] rows in
+      self?.rewardsSummaryView.rows = rows
+    }
     
     reloadUIState()
     setupPublisherView(publisherSummaryView)
@@ -216,8 +218,8 @@ class WalletViewController: UIViewController, RewardsSummaryProtocol {
         self.showServerErrorNotification()
       }
     }
-    state.ledger.fetchWalletDetails { properties in
-      if properties == nil && self.state.ledger.walletInfo == nil {
+    state.ledger.getRewardsParameters { properties in
+      if properties == nil && self.state.ledger.rewardsParameters == nil {
         // No wallet properties to display: Error
         self.showServerErrorNotification()
       }
@@ -566,7 +568,7 @@ extension WalletViewController {
       }
       if path.status == .satisfied {
         if self.state.ledger.balance != nil &&
-          self.state.ledger.walletInfo != nil {
+          self.state.ledger.rewardsParameters != nil {
           //hide network not available banner
           self.walletView.setNotificationView(nil, animated: true)
           self.loadNextNotification()
@@ -598,7 +600,7 @@ extension WalletViewController {
   }
   
   private func loadNextNotification() {
-    if state.ledger.balance == nil || state.ledger.walletInfo == nil {
+    if state.ledger.balance == nil || state.ledger.rewardsParameters == nil {
       // Showing error
       return
     }
@@ -719,24 +721,26 @@ extension WalletViewController {
       guard let self = self, self.isViewLoaded else {
         return
       }
-      let rows = self.summaryRows.map({ row -> RowView in
-        row.isHidden = true
-        return row
-      })
-      UIView.animate(withDuration: 0.15, animations: {
-        self.rewardsSummaryView.stackView.arrangedSubviews.forEach({
+      self.summaryRows { [weak self] rows in
+        guard let self = self else { return }
+        rows.forEach {
           $0.isHidden = true
-          $0.alpha = 0
-        })
-      }, completion: { _ in
-        self.rewardsSummaryView.rows = rows
+        }
         UIView.animate(withDuration: 0.15, animations: {
           self.rewardsSummaryView.stackView.arrangedSubviews.forEach({
-            $0.isHidden = false
-            $0.alpha = 1
+            $0.isHidden = true
+            $0.alpha = 0
+          })
+        }, completion: { _ in
+          self.rewardsSummaryView.rows = rows
+          UIView.animate(withDuration: 0.15, animations: {
+            self.rewardsSummaryView.stackView.arrangedSubviews.forEach({
+              $0.isHidden = false
+              $0.alpha = 1
+            })
           })
         })
-      })
+      }
     }
     ledgerObserver.pendingContributionAdded = { [weak self] in
       self?.updatePendingContributionsState()

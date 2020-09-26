@@ -51,6 +51,12 @@ extension Preferences {
         public static let ntpCheckDate = Option<TimeInterval?>(key: "ntp.next-check-date", default: nil)
     }
     
+    public final class BraveToday {
+        public static let isEnabled = Option<Bool>(key: "brave-today.enabled", default: true)
+        public static let languageChecked = Option<Bool>(key: "brave-today.language-checked", default: false)
+        public static let isShowingIntroCard = Option<Bool>(key: "brave-today.showing-intro-card", default: true)
+    }
+    
     public final class Review {
         /// Application Launch Count (how many times the application has been launched)
         public static let launchCount = Option<Int>(key: "review.launch-count", default: 0)
@@ -94,11 +100,13 @@ extension Preferences {
         public static let useRegionAdBlock = Option<Bool>(key: "shields.regional-adblock", default: true)
         /// Version of downloaded data file for adblock stats.
         public static let adblockStatsDataVersion = Option<Int?>(key: "stats.adblock-data-version", default: nil)
+        /// Whether or not advanced controls in the shields UI are visible by default
+        public static let advancedControlsVisible = Option<Bool>(key: "shields.advanced-controls-visible", default: false)
     }
     
     public final class Rewards {
         public static let myFirstAdShown = Option<Bool>(key: "rewards.ads.my-first-ad-shown", default: false)
-        public static let hideRewardsIcon = Option<Bool>(key: "rewards.hide-rewards-icon", default: false)
+        public static let hideRewardsIcon = Option<Bool>(key: "rewards.hide-rewards-icon", default: true)
         public static let panelOpened = Option<Bool>(key: "rewards.rewards-panel-opened", default: false)
         public static let isUsingBAP = Option<Bool?>(key: "rewards.is-using-bap", default: nil)
         public static let checkedPreviousCycleForAdsViewing = Option<Bool>(key: "rewards.checked-previous-ads-cycle", default: false)

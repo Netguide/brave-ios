@@ -21,9 +21,6 @@
 /* Privacy - Photo Library Additions Usage Description */
 "NSPhotoLibraryAddUsageDescription" = "写真を保存することができます。";
 
-/* Privacy - Photo Library Usage Description */
-"NSPhotoLibraryUsageDescription" = "写真を保存してアップロードすることができます。";
-
 /* (No Comment) */
 "ShortcutItemTitleNewPrivateTab" = "新しいプライベートタブ";
 

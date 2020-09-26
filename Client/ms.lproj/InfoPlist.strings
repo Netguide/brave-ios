@@ -21,9 +21,6 @@
 /* Privacy - Photo Library Additions Usage Description */
 "NSPhotoLibraryAddUsageDescription" = "Ini membolehkan anda menyimpan foto.";
 
-/* Privacy - Photo Library Usage Description */
-"NSPhotoLibraryUsageDescription" = "Ini membolehkan anda menyimpan dan memuat naik foto.";
-
 /* (No Comment) */
 "ShortcutItemTitleNewPrivateTab" = "Tab Peribadi Baharu";
 

@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.20](https://github.com/brave/brave-ios/releases/tag/v1.20)
+
+ - Added ability to set Brave as the default browser. ([#2785](https://github.com/brave/brave-ios/issues/2785))
+ - Fixed YouTube failing to load the next page of videos when scrolling. ([#2810](https://github.com/brave/brave-ios/issues/2810))
+ - Updated onboarding flow to inform users about one-time clipboard check on first launch. ([#2832](https://github.com/brave/brave-ios/issues/2832))
+ - Updated user agent to be the same per iOS version. ([#2864](https://github.com/brave/brave-ios/issues/2864))
+ - Updated text to be more clear under the VPN In-App Purchase (IAP) subscription model. ([#2747](https://github.com/brave/brave-ios/issues/2747))
+ - Removed all references to USD on both the rewards panel and tips banner. ([#2829](https://github.com/brave/brave-ios/issues/2829))
+ 
+## [1.19.2](https://github.com/brave/brave-ios/releases/tag/v1.19.2)
+
+ - Implemented URL scheme handlers for both "HTTP" and "HTTPS". ([#2784](https://github.com/brave/brave-ios/issues/2784))
+ - Removed Sync UI from settings. ([#2718](https://github.com/brave/brave-ios/issues/2718))
+ 
+## [1.19](https://github.com/brave/brave-ios/releases/tag/v1.19)
+
+ - Implemented "Brave Firewall + VPN". ([#2739](https://github.com/brave/brave-ios/issues/2739))
+ - Updated Brave Rewards to display BAT values to three decimal places. ([#2596](https://github.com/brave/brave-ios/issues/2596))
+ - Fixed favorite list not updating on New Tab Page when an existing favorite is deleted. ([#2685](https://github.com/brave/brave-ios/issues/2685))
+
 ## [1.18.1](https://github.com/brave/brave-ios/releases/tag/v1.18.1)
 
  - Fixed pre-roll ads being shown on YouTube videos. ([#511](https://github.com/brave/brave-ios/issues/511))

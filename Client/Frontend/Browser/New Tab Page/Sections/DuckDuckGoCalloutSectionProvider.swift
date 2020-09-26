@@ -9,6 +9,11 @@ import Shared
 import BraveShared
 
 private class DuckDuckGoCalloutButton: SpringButton, Themeable {
+    fileprivate struct UX {
+        static let logoSize = CGSize(width: 38, height: 38)
+        static let padding = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 20)
+    }
+    
     private let backgroundView = UIVisualEffectView(effect: UIBlurEffect(style: .dark)).then {
         $0.clipsToBounds = true
         $0.isUserInteractionEnabled = false
@@ -40,10 +45,10 @@ private class DuckDuckGoCalloutButton: SpringButton, Themeable {
             $0.edges.equalToSuperview()
         }
         logoImageView.snp.makeConstraints {
-            $0.size.equalTo(38)
+            $0.size.equalTo(UX.logoSize)
         }
         stackView.snp.makeConstraints {
-            $0.edges.equalToSuperview().inset(UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 20))
+            $0.edges.equalToSuperview().inset(UX.padding)
         }
     }
     
@@ -53,27 +58,12 @@ private class DuckDuckGoCalloutButton: SpringButton, Themeable {
     }
 }
 
-private class DuckDuckGoCalloutCell: NewTabCollectionViewCell<DuckDuckGoCalloutButton> {
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        view.snp.remakeConstraints {
-            $0.top.bottom.equalToSuperview()
-            $0.centerX.equalToSuperview()
-        }
-    }
-    
-    override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
-        // swiftlint:disable:next force_cast
-        let attributes = layoutAttributes.copy() as! UICollectionViewLayoutAttributes
-        attributes.size.height = systemLayoutSizeFitting(layoutAttributes.size, withHorizontalFittingPriority: .required, verticalFittingPriority: .fittingSizeLevel).height
-        return attributes
-    }
-}
-
 class DuckDuckGoCalloutSectionProvider: NSObject, NTPObservableSectionProvider {
     var sectionDidChange: (() -> Void)?
     private let profile: Profile
     private let action: () -> Void
+    
+    private typealias DuckDuckGoCalloutCell = NewTabCenteredCollectionViewCell<DuckDuckGoCalloutButton>
     
     init(profile: Profile, action: @escaping () -> Void) {
         self.profile = profile
@@ -113,7 +103,11 @@ class DuckDuckGoCalloutSectionProvider: NSObject, NTPObservableSectionProvider {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return fittingSizeForCollectionView(collectionView, section: indexPath.section)
+        var size = fittingSizeForCollectionView(collectionView, section: indexPath.section)
+        size.height = DuckDuckGoCalloutButton.UX.logoSize.height +
+            DuckDuckGoCalloutButton.UX.padding.top +
+            DuckDuckGoCalloutButton.UX.padding.bottom
+        return size
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {

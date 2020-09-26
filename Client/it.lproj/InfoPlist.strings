@@ -21,9 +21,6 @@
 /* Privacy - Photo Library Additions Usage Description */
 "NSPhotoLibraryAddUsageDescription" = "Questa impostazione ti permette di salvare le foto.";
 
-/* Privacy - Photo Library Usage Description */
-"NSPhotoLibraryUsageDescription" = "Questa impostazione ti permette di salvare e caricare le foto.";
-
 /* (No Comment) */
 "ShortcutItemTitleNewPrivateTab" = "Nuova scheda privata";
 
